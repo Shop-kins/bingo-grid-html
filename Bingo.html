@@ -22,43 +22,43 @@
     </tr>
     <tr>
         <th id="000" class="row-header">Row1</th>
-        <td id="00" class="">X</td>
-        <td id="01" class="">X</td>
-        <td id="02" class="">X</td>
-        <td id="03" class="">X</td>
-        <td id="04" class="">X</td>
+        <td id="00">X</td>
+        <td id="01">X</td>
+        <td id="02">X</td>
+        <td id="03">X</td>
+        <td id="04">X</td>
     </tr>
     <tr>
         <th id="010" class="row-header">Row2</th>
-        <td id="10" class="">X</td>
-        <td id="11" class="">X</td>
-        <td id="12" class="">X</td>
-        <td id="13" class="">X</td>
-        <td id="14" class="">X</td>
+        <td id="10">X</td>
+        <td id="11">X</td>
+        <td id="12">X</td>
+        <td id="13">X</td>
+        <td id="14">X</td>
     </tr>
     <tr>
         <th id="020" class="row-header">Row3</th>
-        <td id="20" class="">X</td>
-        <td id="21" class="">X</td>
-        <td id="22" class="">X</td>
-        <td id="23" class="">X</td>
-        <td id="24" class="">X</td>
+        <td id="20">X</td>
+        <td id="21">X</td>
+        <td id="22">X</td>
+        <td id="23">X</td>
+        <td id="24">X</td>
     </tr>
     <tr>
         <th id="030" class="row-header">Row4</th>
-        <td id="30" class="">X</td>
-        <td id="31" class="">X</td>
-        <td id="32" class="">X</td>
-        <td id="33" class="">X</td>
-        <td id="34" class="">X</td>
+        <td id="30">X</td>
+        <td id="31">X</td>
+        <td id="32">X</td>
+        <td id="33">X</td>
+        <td id="34">X</td>
     </tr>
     <tr>
         <th id="040" class="row-header">Row5</th>
-        <td id="40" class="">X</td>
-        <td id="41" class="">X</td>
-        <td id="42" class="">X</td>
-        <td id="43" class="">X</td>
-        <td id="44" class="">X</td>
+        <td id="40">X</td>
+        <td id="41">X</td>
+        <td id="42">X</td>
+        <td id="43">X</td>
+        <td id="44">X</td>
     </tr>
     <tr>
         <th id="BL-TR" class="corner">BL-TR</th>
@@ -67,82 +67,151 @@
 </table>
 
 <script>
+    var newWin;
     (function(){
-        $("td").click(function(){
-            if($(this).css("background-color") == "rgb(0, 0, 0)") {
-                $(this).addClass('green');
-                return;
-            }
-            if($(this).css("background-color") == "rgb(0, 128, 0)") {
-                $(this).removeClass('green');
-                $(this).addClass('red');
-                return
-            }
-            $(this).removeClass('red');
+        $("td").click(function(){tdOnClick(this)});
+
+        $("th").click(function(){
+            bingoLineWindow(this)
         });
 
         $(".column-header").hover(function(){
                 var int = parseInt(this.id);
-                $('#0' + int).addClass('on-hover');
-                for (x = 10; x <= 40; x+=10) {
-                    $('#' + (int + x)).addClass('on-hover')
-                }
+                columnIdsGetter(int).forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
             },
             function(){
                 var int = parseInt(this.id);
-                $('#0' + int).removeClass('on-hover');
-                for (x = 10; x <= 40; x+=10) {
-                    $('#' + (int + x)).removeClass('on-hover')
-                }
+                columnIdsGetter(int).forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
             });
 
         $(".row-header").hover(function(){
                 var int = parseInt(this.id);
-                for (x = 0; x <= 4; x++) {
-                    var id = (int + x);
-                    if(id < 10) id = '0' + id;
-                    $('#' + id).addClass('on-hover')
-                }
+                rowIdsGetter(int).forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
             },
             function(){
                 var int = parseInt(this.id);
-                for (x = 0; x <= 4; x++) {
-                    var id = (int + x);
-                    if(id < 10) id = '0' + id;
-                    $('#' + id).removeClass('on-hover')
-                }
+                rowIdsGetter(int).forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
             });
 
         $("#TL-BR").hover(function(){
-                $('#00').addClass('on-hover');
-                for (x = 0; x <= 4; x++) {
-                    $('#' + (x*11)).addClass('on-hover')
-                }
+                TLBRIdsGetter().forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
             },
             function(){
-                $('#00').removeClass('on-hover');
-                for (x = 0; x <= 4; x++) {
-                    $('#' + (x*11)).removeClass('on-hover')
-                }
+                TLBRIdsGetter().forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
             });
 
         $("#BL-TR").hover(function(){
-                var max = 4;
-                $('#04').addClass('on-hover');
-                for (x = 0; x <= max-1; x++) {
-                    var tens = (4-x)*10;
-                    $('#' + (tens + x)).addClass('on-hover')
-                }
+                BLTRIdsGetter().forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
             },
             function(){
-                var max = 4;
-                $('#04').removeClass('on-hover');
-                for (x = 0; x <= max-1; x++) {
-                    var tens = (4-x)*10;
-                    $('#' + (tens + x)).removeClass('on-hover')
-                }
+                BLTRIdsGetter().forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
             })
     })();
+
+    function columnIdsGetter(int){
+        var ids = [];
+        ids.push('#0' + int);
+        for (x = 10; x <= 40; x+=10) {
+            ids.push('#' + (int + x));
+        }
+        return ids;
+    }
+
+    function rowIdsGetter(int){
+        var ids = [];
+        for (x = 0; x <= 4; x++) {
+            var id = (int + x);
+            if(id < 10) id = '0' + id;
+            ids.push('#' + id);
+        }
+        return ids;
+    }
+
+    function TLBRIdsGetter(){
+        var ids = [];
+        ids.push('#00');
+        for (x = 1; x <= 4; x++) {
+            ids.push('#' + (x*11));
+        }
+        return ids;
+    }
+
+    function BLTRIdsGetter(){
+        var ids = [];
+        var max = 4;
+        ids.push('#04');
+        for (x = 0; x <= max-1; x++) {
+            var tens = (4-x)*10;
+            ids.push('#' + (tens + x));
+        }
+        return ids;
+    }
+
+    function bingoLineWindow(th){
+        if(newWin){
+            newWin.close()
+        }
+        newWin = window.open(
+            "line.html",
+            "BingoLine",
+            "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=180,height=520,top="+(screen.height-100)+",left="+(screen.width-40)
+        );
+        var values;
+        if($(th).hasClass('column-header')){
+            values = columnIdsGetter(parseInt(th.id));
+        }
+        if($(th).hasClass('row-header')){
+            values = rowIdsGetter(parseInt(th.id));
+        }
+        if($(th).is('#TL-BR')){
+            values = TLBRIdsGetter()
+        }
+        if($(th).is('#BL-TR')){
+            values = BLTRIdsGetter()
+        }
+        var table = document.createElement('table');
+        table.setAttribute('cellspacing', 0);
+        var count = 1;
+        values.forEach(function(item){
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+            td.innerHTML = $(item).html();
+            td.id = count;
+            tr.appendChild(td);
+            table.appendChild(tr);
+            count ++;
+        });
+        newWin.dataFromParent = table;
+    }
+
+    function tdOnClick(item){
+        if($(item).css("background-color") == "rgb(0, 0, 0)") {
+            $(item).addClass('green');
+            return;
+        }
+        if($(item).css("background-color") == "rgb(0, 128, 0)") {
+            $(item).removeClass('green');
+            $(item).addClass('red');
+            return
+        }
+        $(item).removeClass('red');
+    }
 
     function roll(){
         $('#generate-submit').attr('disabled', true);
@@ -184,6 +253,7 @@
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
+        cursor: pointer;
     }
     .row-header, .corner {
         width: 45px;
@@ -206,6 +276,5 @@
         color: white;
         margin-bottom: 15px;
     }
-
 </style>
 </body></html>
