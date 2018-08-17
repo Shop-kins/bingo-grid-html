@@ -8,6 +8,8 @@
 </div>
 <form action="javascript:roll();" _lpchecked="1">
     Seed: <input id="seed" name="seed" type="text">
+    <input type="radio" name="mode" value="easyhard" checked="checked">Easy/Hard<br>
+    <input type="radio" name="mode" value="latin">Latin Square<br>
     <input id="generate-submit" value="Generate" type="submit">
 </form>
 <table cellspacing="0">
@@ -216,8 +218,9 @@
     function roll(){
         $('#generate-submit').attr('disabled', true);
         var seed = $('#seed').val();
-        var url = "https://1315fpmdqe.execute-api.us-east-2.amazonaws.com/deployment/createGrid";
-        if(seed) url += "?seed=" + seed;
+        var mode = $('input[name=mode]:checked').val();
+        var url = "https://1315fpmdqe.execute-api.us-east-2.amazonaws.com/deployment/createGrid?mode=mode";
+        if(seed) url += "&seed=" + seed;
         $.get(url, function(data){
             console.log('RETREIVED GRID DATA');
             $('#generate-submit').attr('disabled', false);
