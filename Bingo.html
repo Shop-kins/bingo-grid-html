@@ -6,6 +6,10 @@
         <div class="alert">
             If you are the first person to use this in a while the initial generation will take a bit longer
         </div>
+        <form action="javascript:joinRoom();" _lpchecked="1">
+            Room: <input id="room" name="room" type="password">
+            <input id="join-submit" value="Join" type="submit">
+        </form>
         <form action="javascript:roll();" _lpchecked="1">
             Seed: <input id="seed" name="seed" type="text">
                     <input type="radio" name="mode" value="latin" checked="checked">Latin Square
@@ -69,7 +73,11 @@
         
         <script>
             var newWin;
+            var awsSocket;
+            var inRoom = false;
+            var room;
             (function(){
+
              $("td").click(function(){tdOnClick(this)});
              
              $("th").click(function(){
@@ -122,7 +130,9 @@
                                BLTRIdsGetter().forEach(function(item){
                                                        $(item).removeClass('on-hover')
                                                        })
-                               })
+                               });
+
+
              })();
              
              function columnIdsGetter(int){
@@ -162,6 +172,27 @@
                 ids.push('#' + (tens + x));
             }
             return ids;
+        }
+
+        function joinRoom(){
+            var submit = $('#room-submit');
+            submit.attr('disabled', true);
+            if(awsSocket != null) awsSocket.close();
+            room = $('#room').val();
+            awsSocket = new WebSocket("deployment?room=" + room);
+            inRoom = true;
+
+            awsSocket.onmessage = function(event) {
+                var item = $('#'+ event.data);
+                if($(item).css("background-color") != "rgb(139, 0, 139)") {
+                    $(item).addClass('purple');
+                    $(item).prop('disabled', true);
+                } else {
+                    $(item).removeClass('purple');
+                    $(item).prop('disabled', false);
+                }
+            };
+            submit.attr('disabled', false);
         }
         
         function bingoLineWindow(th){
@@ -203,10 +234,18 @@
         
         function tdOnClick(item){
             if($(item).css("background-color") == "rgb(0, 0, 0)") {
+                if(inRoom){
+                    var msg = {action: "send", "room": room, "position": item.id};
+                    awsSocket.send(JSON.stringify(msg));
+                }
                 $(item).addClass('green');
                 return;
             }
             if($(item).css("background-color") == "rgb(0, 128, 0)") {
+                if(inRoom){
+                    var msg0 = {action: "send", "room": room, "position": item.id};
+                    awsSocket.send(JSON.stringify(msg0));
+                }
                 $(item).removeClass('green');
                 $(item).addClass('red');
                 return
@@ -268,6 +307,9 @@
         }
         td.green {
             background: green;
+        }
+        td.purple {
+            background: rgb(139,0,139);
         }
         td.red {
             background: #DF1F1F;
