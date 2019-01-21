@@ -1,325 +1,335 @@
 <html>
-    <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    </head>
-    <body>
-        <div class="alert">
-            If you are the first person to use this in a while the initial generation will take a bit longer
-        </div>
-        <form action="javascript:joinRoom();" _lpchecked="1">
-            Room: <input id="room" name="room" type="password">
-            <input id="join-submit" value="Join" type="submit">
-        </form>
-        <form action="javascript:roll();" _lpchecked="1">
-            Seed: <input id="seed" name="seed" type="text">
-                    <input type="radio" name="mode" value="latin" checked="checked">Latin Square
-                        <input id="generate-submit" value="Generate" type="submit">
-        </form>
-        <table cellspacing="0">
-            <tbody>
-                <tr>
-                    <th id="TL-BR" class="corner">TL-BR</th>
-                    <th id="0" class="column-header">Col1</th>
-                    <th id="1" class="column-header">Col2</th>
-                    <th id="2" class="column-header">Col3</th>
-                    <th id="3" class="column-header">Col4</th>
-                    <th id="4" class="column-header">Col5</th>
-                </tr>
-                <tr>
-                    <th id="000" class="row-header">Row1</th>
-                    <td id="00">X</td>
-                    <td id="01">X</td>
-                    <td id="02">X</td>
-                    <td id="03">X</td>
-                    <td id="04">X</td>
-                </tr>
-                <tr>
-                    <th id="010" class="row-header">Row2</th>
-                    <td id="10">X</td>
-                    <td id="11">X</td>
-                    <td id="12">X</td>
-                    <td id="13">X</td>
-                    <td id="14">X</td>
-                </tr>
-                <tr>
-                    <th id="020" class="row-header">Row3</th>
-                    <td id="20">X</td>
-                    <td id="21">X</td>
-                    <td id="22">X</td>
-                    <td id="23">X</td>
-                    <td id="24">X</td>
-                </tr>
-                <tr>
-                    <th id="030" class="row-header">Row4</th>
-                    <td id="30">X</td>
-                    <td id="31">X</td>
-                    <td id="32">X</td>
-                    <td id="33">X</td>
-                    <td id="34">X</td>
-                </tr>
-                <tr>
-                    <th id="040" class="row-header">Row5</th>
-                    <td id="40">X</td>
-                    <td id="41">X</td>
-                    <td id="42">X</td>
-                    <td id="43">X</td>
-                    <td id="44">X</td>
-                </tr>
-                <tr>
-                    <th id="BL-TR" class="corner">BL-TR</th>
-                </tr>
-            </tbody>
-        </table>
-        
-        <script>
-            var newWin;
-            var awsSocket;
-            var inRoom = false;
-            var room;
-            (function(){
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+<body>
+<div class="alert">
+    If you are the first person to use this in a while the initial generation will take a bit longer
+</div>
+<form action="javascript:joinRoom();" _lpchecked="1">
+    Room: <input id="room" name="room" type="password">
+    <input id="join-submit" value="Join" type="submit">
+</form>
+<form action="javascript:roll();" _lpchecked="1">
+    Seed: <input id="seed" name="seed" type="text">
+    <input type="radio" name="mode" value="latin" checked="checked">Latin Square
+    <input id="generate-submit" value="Generate" type="submit">
+</form>
+<table cellspacing="0">
+    <tbody>
+    <tr>
+        <th id="TL-BR" class="corner">TL-BR</th>
+        <th id="0" class="column-header">Col1</th>
+        <th id="1" class="column-header">Col2</th>
+        <th id="2" class="column-header">Col3</th>
+        <th id="3" class="column-header">Col4</th>
+        <th id="4" class="column-header">Col5</th>
+    </tr>
+    <tr>
+        <th id="000" class="row-header">Row1</th>
+        <td id="00">X</td>
+        <td id="01">X</td>
+        <td id="02">X</td>
+        <td id="03">X</td>
+        <td id="04">X</td>
+    </tr>
+    <tr>
+        <th id="010" class="row-header">Row2</th>
+        <td id="10">X</td>
+        <td id="11">X</td>
+        <td id="12">X</td>
+        <td id="13">X</td>
+        <td id="14">X</td>
+    </tr>
+    <tr>
+        <th id="020" class="row-header">Row3</th>
+        <td id="20">X</td>
+        <td id="21">X</td>
+        <td id="22">X</td>
+        <td id="23">X</td>
+        <td id="24">X</td>
+    </tr>
+    <tr>
+        <th id="030" class="row-header">Row4</th>
+        <td id="30">X</td>
+        <td id="31">X</td>
+        <td id="32">X</td>
+        <td id="33">X</td>
+        <td id="34">X</td>
+    </tr>
+    <tr>
+        <th id="040" class="row-header">Row5</th>
+        <td id="40">X</td>
+        <td id="41">X</td>
+        <td id="42">X</td>
+        <td id="43">X</td>
+        <td id="44">X</td>
+    </tr>
+    <tr>
+        <th id="BL-TR" class="corner">BL-TR</th>
+    </tr>
+    </tbody>
+</table>
 
-             $("td").click(function(){tdOnClick(this)});
-             
-             $("th").click(function(){
-                           bingoLineWindow(this)
-                           });
-             
-             $(".column-header").hover(function(){
-                                       var int = parseInt(this.id);
-                                       columnIdsGetter(int).forEach(function(item){
-                                                                    $(item).addClass('on-hover')
-                                                                    })
-                                       },
-                                       function(){
-                                       var int = parseInt(this.id);
-                                       columnIdsGetter(int).forEach(function(item){
-                                                                    $(item).removeClass('on-hover')
-                                                                    })
-                                       });
-             
-             $(".row-header").hover(function(){
-                                    var int = parseInt(this.id);
-                                    rowIdsGetter(int).forEach(function(item){
-                                                              $(item).addClass('on-hover')
-                                                              })
-                                    },
-                                    function(){
-                                    var int = parseInt(this.id);
-                                    rowIdsGetter(int).forEach(function(item){
-                                                              $(item).removeClass('on-hover')
-                                                              })
-                                    });
-             
-             $("#TL-BR").hover(function(){
-                               TLBRIdsGetter().forEach(function(item){
-                                                       $(item).addClass('on-hover')
-                                                       })
-                               },
-                               function(){
-                               TLBRIdsGetter().forEach(function(item){
-                                                       $(item).removeClass('on-hover')
-                                                       })
-                               });
-             
-             $("#BL-TR").hover(function(){
-                               BLTRIdsGetter().forEach(function(item){
-                                                       $(item).addClass('on-hover')
-                                                       })
-                               },
-                               function(){
-                               BLTRIdsGetter().forEach(function(item){
-                                                       $(item).removeClass('on-hover')
-                                                       })
-                               });
+<script>
+    var newWin;
+    var awsSocket;
+    var inRoom = false;
+    var room;
+    (function(){
+
+        $("td").click(function(){tdOnClick(this)});
+
+        $("th").click(function(){
+            bingoLineWindow(this)
+        });
+
+        $(".column-header").hover(function(){
+                var int = parseInt(this.id);
+                columnIdsGetter(int).forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
+            },
+            function(){
+                var int = parseInt(this.id);
+                columnIdsGetter(int).forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
+            });
+
+        $(".row-header").hover(function(){
+                var int = parseInt(this.id);
+                rowIdsGetter(int).forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
+            },
+            function(){
+                var int = parseInt(this.id);
+                rowIdsGetter(int).forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
+            });
+
+        $("#TL-BR").hover(function(){
+                TLBRIdsGetter().forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
+            },
+            function(){
+                TLBRIdsGetter().forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
+            });
+
+        $("#BL-TR").hover(function(){
+                BLTRIdsGetter().forEach(function(item){
+                    $(item).addClass('on-hover')
+                })
+            },
+            function(){
+                BLTRIdsGetter().forEach(function(item){
+                    $(item).removeClass('on-hover')
+                })
+            });
 
 
-             })();
-             
-             function columnIdsGetter(int){
-                 var ids = [];
-                 ids.push('#0' + int);
-                 for (x = 10; x <= 40; x+=10) {
-                     ids.push('#' + (int + x));
-                 }
-                 return ids;
-             }
-        
-        function rowIdsGetter(int){
-            var ids = [];
-            for (x = 0; x <= 4; x++) {
-                var id = (int + x);
-                if(id < 10) id = '0' + id;
-                ids.push('#' + id);
-            }
-            return ids;
+    })();
+
+    function columnIdsGetter(int){
+        var ids = [];
+        ids.push('#0' + int);
+        for (x = 10; x <= 40; x+=10) {
+            ids.push('#' + (int + x));
         }
-        
-        function TLBRIdsGetter(){
-            var ids = [];
-            ids.push('#00');
-            for (x = 1; x <= 4; x++) {
-                ids.push('#' + (x*11));
-            }
-            return ids;
-        }
-        
-        function BLTRIdsGetter(){
-            var ids = [];
-            var max = 4;
-            ids.push('#04');
-            for (x = 0; x <= max-1; x++) {
-                var tens = (4-x)*10;
-                ids.push('#' + (tens + x));
-            }
-            return ids;
-        }
+        return ids;
+    }
 
-        function joinRoom(){
-            var submit = $('#room-submit');
-            submit.attr('disabled', true);
-            if(awsSocket != null) awsSocket.close();
-            room = $('#room').val();
-            awsSocket = new WebSocket("deployment?room=" + room);
-            inRoom = true;
+    function rowIdsGetter(int){
+        var ids = [];
+        for (x = 0; x <= 4; x++) {
+            var id = (int + x);
+            if(id < 10) id = '0' + id;
+            ids.push('#' + id);
+        }
+        return ids;
+    }
 
-            awsSocket.onmessage = function(event) {
-                var item = $('#'+ event.data);
-                if($(item).css("background-color") != "rgb(139, 0, 139)") {
-                    $(item).addClass('purple');
-                    $(item).prop('disabled', true);
-                } else {
-                    $(item).removeClass('purple');
-                    $(item).prop('disabled', false);
+    function TLBRIdsGetter(){
+        var ids = [];
+        ids.push('#00');
+        for (x = 1; x <= 4; x++) {
+            ids.push('#' + (x*11));
+        }
+        return ids;
+    }
+
+    function BLTRIdsGetter(){
+        var ids = [];
+        var max = 4;
+        ids.push('#04');
+        for (x = 0; x <= max-1; x++) {
+            var tens = (4-x)*10;
+            ids.push('#' + (tens + x));
+        }
+        return ids;
+    }
+
+    function joinRoom(){
+        var submit = $('#room-submit');
+        submit.attr('disabled', true);
+        if(awsSocket != null) {
+            awsSocket.onclose = function(event) {};
+            awsSocket.close();
+        }
+        room = $('#room').val();
+        awsSocket = new WebSocket("deployment?room=" + room);
+        inRoom = true;
+
+        awsSocket.onmessage = function(event) {
+            var item = $('#'+ event.data);
+            if($(item).css("background-color") != "rgb(139, 0, 139)") {
+                $(item).addClass('purple');
+                $(item).prop('disabled', true);
+            } else {
+                $(item).removeClass('purple');
+                $(item).prop('disabled', false);
+            }
+        };
+        awsSocket.onclose = function(event) {
+            setTimeout(joinRoom(), 1000)
+        };
+        awsSocket.onerror = function(event) {
+            console.log("Websocket error occurred");
+            setTimeout(joinRoom(), 1000)
+        };
+        submit.attr('disabled', false);
+    }
+
+    function bingoLineWindow(th){
+        if(newWin){
+            newWin.close()
+        }
+        newWin = window.open(
+            "line.html",
+            "BingoLine",
+            "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=180,height=520,top="+(screen.height-100)+",left="+(screen.width-40)
+        );
+        var values;
+        if($(th).hasClass('column-header')){
+            values = columnIdsGetter(parseInt(th.id));
+        }
+        if($(th).hasClass('row-header')){
+            values = rowIdsGetter(parseInt(th.id));
+        }
+        if($(th).is('#TL-BR')){
+            values = TLBRIdsGetter()
+        }
+        if($(th).is('#BL-TR')){
+            values = BLTRIdsGetter()
+        }
+        var table = document.createElement('table');
+        table.setAttribute('cellspacing', 0);
+        var count = 1;
+        values.forEach(function(item){
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+            td.innerHTML = $(item).html();
+            td.id = count;
+            tr.appendChild(td);
+            table.appendChild(tr);
+            count ++;
+        });
+        newWin.dataFromParent = table;
+    }
+
+    function tdOnClick(item){
+        if($(item).css("background-color") == "rgb(0, 0, 0)") {
+            if(inRoom){
+                var msg = {action: "send", "room": room, "position": item.id};
+                awsSocket.send(JSON.stringify(msg));
+            }
+            $(item).addClass('green');
+            return;
+        }
+        if($(item).css("background-color") == "rgb(0, 128, 0)") {
+            if(inRoom){
+                var msg0 = {action: "send", "room": room, "position": item.id};
+                awsSocket.send(JSON.stringify(msg0));
+            }
+            $(item).removeClass('green');
+            $(item).addClass('red');
+            return
+        }
+        $(item).removeClass('red');
+    }
+
+    function roll(){
+        $('#generate-submit').attr('disabled', true);
+        var seed = $('#seed').val();
+        var mode = $('input[name=mode]:checked').val();
+        var url = "https://1315fpmdqe.execute-api.us-east-2.amazonaws.com/deployment/createGrid?mode=" + mode;
+        if(seed) url += "&seed=" + seed;
+        $.get(url, function(data){
+            console.log('RETREIVED GRID DATA');
+            $('#generate-submit').attr('disabled', false);
+            for (x = 0; x <= data.length-1; x++){
+                for (y = 0; y <= data.length-1; y++){
+                    $('#'+x+y).html(data[x][y])
                 }
-            };
-            submit.attr('disabled', false);
-        }
-        
-        function bingoLineWindow(th){
-            if(newWin){
-                newWin.close()
             }
-            newWin = window.open(
-                                 "line.html",
-                                 "BingoLine",
-                                 "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=180,height=520,top="+(screen.height-100)+",left="+(screen.width-40)
-                                 );
-                                 var values;
-                                 if($(th).hasClass('column-header')){
-                                     values = columnIdsGetter(parseInt(th.id));
-                                 }
-                                 if($(th).hasClass('row-header')){
-                                     values = rowIdsGetter(parseInt(th.id));
-                                 }
-                                 if($(th).is('#TL-BR')){
-                                     values = TLBRIdsGetter()
-                                 }
-                                 if($(th).is('#BL-TR')){
-                                     values = BLTRIdsGetter()
-                                 }
-                                 var table = document.createElement('table');
-                                 table.setAttribute('cellspacing', 0);
-                                 var count = 1;
-                                 values.forEach(function(item){
-                                                var tr = document.createElement('tr');
-                                                var td = document.createElement('td');
-                                                td.innerHTML = $(item).html();
-                                                td.id = count;
-                                                tr.appendChild(td);
-                                                table.appendChild(tr);
-                                                count ++;
-                                                });
-                                                newWin.dataFromParent = table;
-        }
-        
-        function tdOnClick(item){
-            if($(item).css("background-color") == "rgb(0, 0, 0)") {
-                if(inRoom){
-                    var msg = {action: "send", "room": room, "position": item.id};
-                    awsSocket.send(JSON.stringify(msg));
-                }
-                $(item).addClass('green');
-                return;
-            }
-            if($(item).css("background-color") == "rgb(0, 128, 0)") {
-                if(inRoom){
-                    var msg0 = {action: "send", "room": room, "position": item.id};
-                    awsSocket.send(JSON.stringify(msg0));
-                }
-                $(item).removeClass('green');
-                $(item).addClass('red');
-                return
-            }
-            $(item).removeClass('red');
-        }
-        
-        function roll(){
-            $('#generate-submit').attr('disabled', true);
-            var seed = $('#seed').val();
-            var mode = $('input[name=mode]:checked').val();
-            var url = "https://1315fpmdqe.execute-api.us-east-2.amazonaws.com/deployment/createGrid?mode=" + mode;
-            if(seed) url += "&seed=" + seed;
-            $.get(url, function(data){
-                  console.log('RETREIVED GRID DATA');
-                  $('#generate-submit').attr('disabled', false);
-                  for (x = 0; x <= data.length-1; x++){
-                  for (y = 0; y <= data.length-1; y++){
-                  $('#'+x+y).html(data[x][y])
-                  }
-                  }
-                  })
-        }
-        </script>
-        <style>
-            th {
-                background: black;
-                color: #6282B1;
-                border: 1px solid #6282B1;
-                font-size: 75%;
-            }
-        td {
-            background: black;
-            color: white;
-            border: 1px solid grey;
-            font-size: 75%;
-        }
-        td, th {
-            width: 150px;
-            height: 100px;
-            text-align: center;
-            font-weight: 900;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            cursor: pointer;
-        }
-        .row-header, .corner {
-            width: 45px;
-        }
-        .column-header, .corner {
-            height: 45px;
-        }
-        td.on-hover {
-            background: #3B639D;
-        }
-        td.green {
-            background: green;
-        }
-        td.purple {
-            background: rgb(139,0,139);
-            cursor: default;
-        }
-        td.red {
-            background: #DF1F1F;
-        }
-        .alert {
-            padding: 20px;
-            background-color: #6282B1;
-            color: white;
-            margin-bottom: 15px;
-        }
-        </style>
-    </body></html>
+        })
+    }
+</script>
+<style>
+    th {
+        background: black;
+        color: #6282B1;
+        border: 1px solid #6282B1;
+        font-size: 75%;
+    }
+    td {
+        background: black;
+        color: white;
+        border: 1px solid grey;
+        font-size: 75%;
+    }
+    td, th {
+        width: 150px;
+        height: 100px;
+        text-align: center;
+        font-weight: 900;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+    }
+    .row-header, .corner {
+        width: 45px;
+    }
+    .column-header, .corner {
+        height: 45px;
+    }
+    td.on-hover {
+        background: #3B639D;
+    }
+    td.green {
+        background: green;
+    }
+    td.red {
+        background: #DF1F1F;
+    }
+    td.purple {
+        background: rgb(139,0,139);
+        cursor: default;
+    }
+    .alert {
+        padding: 20px;
+        background-color: #6282B1;
+        color: white;
+        margin-bottom: 15px;
+    }
+</style>
+</body></html>
