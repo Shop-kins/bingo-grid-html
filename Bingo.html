@@ -196,6 +196,7 @@
             }
         };
         awsSocket.onclose = function(event) {
+            console.log("Websocket closed, reconnecting");
             setTimeout(joinRoom(), 1000)
         };
         awsSocket.onerror = function(event) {
