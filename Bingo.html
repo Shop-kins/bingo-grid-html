@@ -11,9 +11,13 @@
     <input id="join-submit" value="Join" type="submit">
 </form>
 <form action="javascript:roll();" _lpchecked="1">
-    Seed: <input id="seed" name="seed" type="text">
+    Seed: <label for="seed"></label><input id="seed" name="seed" type="text">
     <input type="radio" name="mode" value="latin" checked="checked">Latin Square
     <input id="generate-submit" value="Generate" type="submit">
+</form>
+<form action="javascript:chooseMe();" _lpchecked="1">
+    Name Of Indecisive Person: <input id="seedName" name="seedName" type="text">
+    <input id="choose-submit" value="Choose for me" type="submit">
 </form>
 <table cellspacing="0">
     <tbody>
@@ -279,6 +283,67 @@
                 }
             }
         })
+    }
+
+    function chooseMe(){
+        var seed = $('#seedName').val();
+        var seedRnd = xmur3(seed);
+        var num = mulberry32(seedRnd());
+        var choice = Math.floor(num()*13);
+        if(newWin){
+            newWin.close()
+        }
+        newWin = window.open(
+            "line.html",
+            "BingoLine",
+            "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no,width=180,height=520,top="+(screen.height-100)+",left="+(screen.width-40)
+        );
+        var values;
+        if(choice < 5){
+            values = columnIdsGetter(choice);
+        }else if(choice < 11){
+            var adjustChoice = choice - 6;
+            values = rowIdsGetter(parseInt("0" + adjustChoice + "0"));
+        }
+        if(choice == 11){
+            values = TLBRIdsGetter()
+        }
+        if(choice == 12){
+            values = BLTRIdsGetter()
+        }
+        var table = document.createElement('table');
+        table.setAttribute('cellspacing', 0);
+        var count = 1;
+        values.forEach(function(item){
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+            td.innerHTML = $(item).html();
+            td.id = count;
+            tr.appendChild(td);
+            table.appendChild(tr);
+            count ++;
+        });
+        newWin.dataFromParent = table;
+    }
+
+    function xmur3(str) {
+        for(var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
+            h = Math.imul(h ^ str.charCodeAt(i), 3432918353),
+                h = h << 13 | h >>> 19;
+        return function() {
+            h = Math.imul(h ^ h >>> 16, 2246822507);
+            h = Math.imul(h ^ h >>> 13, 3266489909);
+            return (h ^= h >>> 16) >>> 0;
+        }
+    }
+
+    function mulberry32(a) {
+        return function() {
+            var t = a += 0x6D2B79F5;
+            t = Math.imul(t ^ t >>> 15, t | 1);
+            t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+            return ((t ^ t >>> 14) >>> 0) / 4294967296;
+        }
     }
 </script>
 <style>
