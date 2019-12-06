@@ -287,7 +287,8 @@
 
     function chooseMe(){
         var seed = $('#seedName').val();
-        var seedRnd = xmur3(seed);
+        var genSeed = $('#seed').val();
+        var seedRnd = xmur3(genSeed + seed);
         var num = mulberry32(seedRnd());
         var choice = Math.floor(num()*13);
         if(newWin){
