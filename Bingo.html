@@ -190,6 +190,7 @@
         inRoom = true;
 
         awsSocket.onmessage = function(event) {
+            console.log(event.data)
             var item = $('#'+ event.data);
             if($(item).css("background-color") != "rgb(139, 0, 139)") {
                 $(item).addClass('purple');
