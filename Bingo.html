@@ -274,7 +274,7 @@
             $(item).addClass('green');
             return;
         }
-        if($(item).css("background-color") == "rgb(0, 128, 0") {
+        if($(item).css("background-color") == "rgb(0, 128, 0)") {
             if(inRoom){
                 var msg0 = {action: "send", "room": room, "position": item.id};
                 awsSocket.send(JSON.stringify(msg0));
