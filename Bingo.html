@@ -196,10 +196,10 @@
             var eventData = JSON.parse(event.data)
             var item = $('#'+ eventData.position);
             var colour = getColourForId(eventData.from_id)
-            if($(item).css("background-color") == "rgb(223,31,31)") {
+            if($(item).css("background-color") == "rgb(223, 31, 31)") {
                 $(item).addClass(colour);
                 $(item).prop('disabled', true);
-            } else if($(item).css("background-color") == "rgb(0,0,0)") {
+            } else if($(item).css("background-color") == "rgb(0, 0, 0)") {
                 $(item).addClass(colour);
                 $(item).prop('disabled', true);
             } else {
