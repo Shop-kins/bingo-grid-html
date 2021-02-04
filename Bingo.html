@@ -78,6 +78,9 @@
 <script>
     var newWin;
     var awsSocket;
+    var colourDictionary = new Object();
+    var colourList = ["purple", "yellow", "blue", "pink"]
+    var colourIndex = 0;
     var inRoom = false;
     var room;
     (function(){
@@ -190,13 +193,17 @@
         inRoom = true;
 
         awsSocket.onmessage = function(event) {
-            console.log(event.data)
-            var item = $('#'+ event.data);
-            if($(item).css("background-color") != "rgb(139, 0, 139)") {
-                $(item).addClass('purple');
+            var eventData = JSON.parse(event.data)
+            var item = $('#'+ eventData.position);
+            var colour = getColourForId(eventData.from_id)
+            if($(item).css("background-color") == "rgb(223,31,31)") {
+                $(item).addClass(colour);
+                $(item).prop('disabled', true);
+            } else if($(item).css("background-color") == "rgb(0,0,0)") {
+                $(item).addClass(colour);
                 $(item).prop('disabled', true);
             } else {
-                $(item).removeClass('purple');
+                $(item).removeClass(colour);
                 $(item).prop('disabled', false);
             }
         };
@@ -209,6 +216,16 @@
             setTimeout(joinRoom(), 1000)
         };
         submit.attr('disabled', false);
+    }
+    
+    function getColourForId(id){
+        var colour = colourDictionary[id]
+        if(colour == null){
+            var colour = colourList[colourIndex]
+            colourDictionary[id] = colour
+            colourIndex ++
+        }
+        return colour
     }
 
     function bingoLineWindow(th){
@@ -350,13 +367,13 @@
 </script>
 <style>
     th {
-        background: black;
+        background: rgb(0,0,0);
         color: #6282B1;
         border: 1px solid #6282B1;
         font-size: 75%;
     }
     td {
-        background: black;
+        background: rgb(0,0,0);
         color: white;
         border: 1px solid grey;
         font-size: 75%;
@@ -384,13 +401,25 @@
         background: #3B639D;
     }
     td.green {
-        background: green;
+        background: rgb(0,255,0);
     }
     td.red {
-        background: #DF1F1F;
+        background: rgb(223,31,31);
     }
     td.purple {
         background: rgb(139,0,139);
+        cursor: default;
+    }
+    td.yellow {
+        background: rgb(255,246,79);
+        cursor: default;
+    }
+    td.blue {
+        background: rgb(255,246,79);
+        cursor: default;
+    }
+    td.pink {
+        background: rgb(255,79,249);
         cursor: default;
     }
     .alert {
