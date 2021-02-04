@@ -79,9 +79,7 @@
 <script>
     var newWin;
     var awsSocket;
-    var colourDictionary = new Object();
     var colourList = ["purple", "yellow", "blue", "pink"]
-    var colourIndex = 0;
     var inRoom = false;
     var room;
     (function(){
@@ -196,7 +194,7 @@
         awsSocket.onmessage = function(event) {
             var eventData = JSON.parse(event.data)
             var item = $('#'+ eventData.position);
-            var colour = getColourForId(eventData.from_id)
+            var colour = colourList[eventData.colour_count]
             if($(item).css("background-color") == "rgb(223, 31, 31)") {
                 $(item).addClass(colour);
                 $(item).prop('disabled', true);
@@ -217,16 +215,6 @@
             setTimeout(joinRoom(), 1000)
         };
         submit.attr('disabled', false);
-    }
-    
-    function getColourForId(id){
-        var colour = colourDictionary[id]
-        if(colour == null){
-            var colour = colourList[colourIndex]
-            colourDictionary[id] = colour
-            colourIndex ++
-        }
-        return colour
     }
 
     function bingoLineWindow(th){
